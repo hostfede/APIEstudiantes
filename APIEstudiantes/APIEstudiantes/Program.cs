@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,15 @@ builder.Services.AddAuthentication(options  =>
 	// Agregar audiencia de la API.
 	options.Audience  =  "https://api.example.com/estudiantes";
 });
+
+//Configuracion para Validar Autorización. 
+builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("read:estudiantes", policy => policy.Requirements.Add(new HasScopeRequirement("read:estudiantes", "https://dev-a0hk71n1s62bkzxy.us.auth0.com/")));
+        options.AddPolicy("write:estudiantes", policy => policy.Requirements.Add(new HasScopeRequirement("write:estudiantes", "https://dev-a0hk71n1s62bkzxy.us.auth0.com/")));
+    });
+    
+builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
 
 var  app  =  builder.Build();
 
